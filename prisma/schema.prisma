@@ -8,8 +8,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // 自分の環境に合わせる
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
