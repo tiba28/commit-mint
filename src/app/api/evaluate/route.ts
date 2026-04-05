@@ -73,19 +73,17 @@ export async function POST(req: Request) {
         });
 
         // 2. ストリーク（命）の更新
+        // 2. ストリーク（命）の更新
         if (result.isSuccess) {
-            // 成功：ストリークを1増やす
+            // MVPの簡易実装: 成功したらストリークを増やす
+            // (※厳密には「今日すでに成功しているか」のチェックが必要だが、今はフロント側で「完了」画面を出して連続投稿を防ぐUI想定とする)
             await prisma.user.update({
                 where: { id: TEST_USER_ID },
                 data: { currentStreak: { increment: 1 } }
             });
-        } else {
-            // 失敗・チート検知：容赦なくストリークをゼロにリセットする（これが最大の罰）
-            await prisma.user.update({
-                where: { id: TEST_USER_ID },
-                data: { currentStreak: 0 }
-            });
         }
+        // 失敗(else)の場合は、TaskResult（履歴）に失敗の記録が残るだけで、ストリークには一切触れない。
+        // ユーザーはAIのコメントを読んで、もう一度正しい画像をアップロードし直すことができる。
 
         return NextResponse.json(result);
 
