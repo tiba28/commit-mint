@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // 自分の環境に合わせる
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  currentStreak Int       @default(0) // 連続記録
+  maxStreak     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  goals         Goal[]
+}
+
+model Goal {
+  id          String       @id @default(cuid())
+  userId      String
+  title       String       // 例: 「毎日、基本情報の問題を解く」
+  condition   String       // AI判定条件
+  type        GoalType     @default(PHYSICAL) //物理かデジタルか
+  isActive    Boolean      @default(true) // 習慣の有効状態
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskResults TaskResult[]
+}
+
+enum GoalType {
+  PHYSICAL
+  DIGITAL
+}
+
+model TaskResult {
+  id           String   @id @default(cuid())
+  goalId       String
+  imageUrl     String
+  aiConfidence Float?
+  aiComment    String?
+  isSuccess    Boolean
+  submittedAt  DateTime @default(now()) // Cron判定用？
+  evaluatedAt  DateTime @default(now())
+
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+}
