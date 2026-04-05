@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { PrismaClient } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 // クライアントの初期化
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
