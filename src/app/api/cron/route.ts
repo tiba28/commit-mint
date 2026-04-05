@@ -3,9 +3,10 @@ import { PrismaClient } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-const prisma = new PrismaClient();
-
 export async function GET(req: NextRequest) {
+    // ✅ 呼び出された時に初めてデータベースの準備をする（ビルド時の暴発を防ぐ）
+    const prisma = new PrismaClient();
+
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return new NextResponse('Unauthorized', { status: 401 });
